@@ -1,0 +1,30 @@
+{
+  "currentVersion": "1.5.0",
+  "currentDate": "Nov 13, 2026",
+  "currentIsoDate": "2026-11-13",
+  "recent": [
+    {
+      "version": "1.5.0",
+      "date": "Nov 13, 2026",
+      "isoDate": "2026-11-13",
+      "summary": "Reliability release. It finishes the full code review that 1.4.3 started: every remaining significant and minor finding is fixed or tracked."
+    },
+    {
+      "version": "1.4.3",
+      "date": "Nov 12, 2026",
+      "isoDate": "2026-11-12",
+      "summary": "Security and data-safety release, from a full review of the code."
+    },
+    {
+      "version": "1.4.2",
+      "date": "Nov 11, 2026",
+      "isoDate": "2026-11-11",
+      "summary": "Patch release. Nothing here is breaking."
+    }
+  ],
+  "releaseCount": 117,
+  "firstReleaseMonth": "July 2026",
+  "v1Date": "October 31, 2026",
+  "v1IsoDate": "2026-10-31",
+  "generatedAt": "2026-11-13T06:24:51.590Z"
+}
