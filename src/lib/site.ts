@@ -10,7 +10,7 @@ export const QGIS_PLUGIN_URL = 'https://github.com/palavido-dev/gratis-gis-qgis'
 
 export const SITE_TITLE = 'GratisGIS: self-hosted, open source GIS portal';
 export const SITE_DESCRIPTION =
-  'GratisGIS is a self-hosted GIS portal with web maps, PostGIS data layers, forms, dashboards and an offline field app. Open source under AGPL-3.0.';
+  'GratisGIS is an open source GIS portal you run on your own server: web maps, data layers, forms, dashboards and an offline field app, with no per-user fees.';
 
 /** A file or folder in the main repository, on the main branch. */
 export function repoFile(path: string): string {
