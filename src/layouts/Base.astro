@@ -1,10 +1,11 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Page shell: meta tags, self-hosted fonts, header and footer.
-import '@fontsource/ibm-plex-sans/latin-400.css';
-import '@fontsource/ibm-plex-sans/latin-500.css';
-import '@fontsource/ibm-plex-sans/latin-600.css';
-import '@fontsource/ibm-plex-sans/latin-700.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/newsreader/latin-400.css';
+import '@fontsource/newsreader/latin-500.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '../styles/global.css';
@@ -39,7 +40,7 @@ const ogImage = new URL('/og.png', SITE_URL).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
-    <meta name="theme-color" content="#F6F7F4" />
+    <meta name="theme-color" content="#F4F2EC" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -51,7 +52,7 @@ const ogImage = new URL('/og.png', SITE_URL).href;
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="GratisGIS. Your maps, your data, your servers." />
+    <meta property="og:image:alt" content="GratisGIS. A GIS portal your organization owns." />
     <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
   </head>
