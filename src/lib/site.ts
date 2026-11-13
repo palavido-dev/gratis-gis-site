@@ -17,42 +17,6 @@ export function repoFile(path: string): string {
   return `${REPO_URL}/blob/main/${path}`;
 }
 
-/** The current release. Update with each tagged release. */
-export const CURRENT_VERSION = '1.2.0';
-
-export interface Release {
-  version: string;
-  date: string;
-  isoDate: string;
-  summary: string;
-}
-
-/**
- * The three most recent releases, summarized from CHANGELOG.md.
- * Keep the wording to what the changelog entry says.
- */
-export const RECENT_RELEASES: Release[] = [
-  {
-    version: '1.2.0',
-    date: 'Nov 5, 2026',
-    isoDate: '2026-11-05',
-    summary:
-      'Admin Updates page, the point-cloud worker on home NAS installs, and sanitized popup and attribution HTML.',
-  },
-  {
-    version: '1.1.0',
-    date: 'Nov 3, 2026',
-    isoDate: '2026-11-03',
-    summary: 'Home NAS install, @mentions in map comments, and live markup co-editing.',
-  },
-  {
-    version: '1.0.0',
-    date: 'Oct 31, 2026',
-    isoDate: '2026-10-31',
-    summary: 'First stable release. The public surface follows semantic versioning from here on.',
-  },
-];
-
 /**
  * Top-level paths that belong to the portal, not this site. The 404
  * page sends a browser on one of these to the same path on the demo,

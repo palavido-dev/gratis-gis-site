@@ -13,11 +13,16 @@ pnpm install
 pnpm dev      # local server with reload
 pnpm check    # type check
 pnpm build    # static output in dist/
+pnpm sync:releases  # refresh src/data/releases.json from GitHub
 ```
+
+## Release facts
+
+The current version, the recent releases, the release count and the 1.0 date on the home page come from the [GitHub releases](https://github.com/palavido-dev/gratis-gis/releases) of the main repository, read at build time (`src/lib/releases.ts`). `GITHUB_TOKEN` is used when set. If the API cannot be reached, the build logs a warning and uses the committed snapshot in `src/data/releases.json`. Run `pnpm sync:releases` and commit the result to refresh it.
 
 ## Deploy
 
-`.github/workflows/site.yml` builds every pull request. A push to `main` builds and deploys to GitHub Pages once the repository variable `SITE_DEPLOY` is `true`. The first-time setup and the move of the demo to `demo.gratisgis.org` are in [docs/cutover.md](docs/cutover.md).
+`.github/workflows/site.yml` builds every pull request. A push to `main`, a manual run and a scheduled run every 6 hours build and deploy to GitHub Pages once the repository variable `SITE_DEPLOY` is `true`. The first-time setup and the move of the demo to `demo.gratisgis.org` are in [docs/cutover.md](docs/cutover.md).
 
 ## Screenshots
 

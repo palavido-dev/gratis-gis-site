@@ -4,6 +4,9 @@ name: Site
 #
 # Pull requests build the site and stop. A push to main
 # builds it and, once Pages is turned on, deploys it to GitHub Pages.
+# The build reads release facts from the GitHub releases API, so a
+# scheduled run every 6 hours (and a manual run) rebuilds and redeploys
+# the site to pick up new releases without a commit here.
 #
 # First run: the deploy job is skipped until the repository variable
 # SITE_DEPLOY is set to "true" (Settings > Secrets and variables >
@@ -16,6 +19,8 @@ on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 # Nothing by default. Each job asks for what it needs.
@@ -55,6 +60,10 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          # Read the releases API as this repository, not anonymously, to
+          # stay clear of the anonymous rate limit.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload the Pages artifact
         # Only main deploys, so only main needs the artifact.

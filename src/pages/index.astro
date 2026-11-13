@@ -1,20 +1,17 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Home page. Facts here are checked against README.md, CHANGELOG.md
-// and the code. When a release changes one, update it here too.
+// and the code. Release facts (version, dates, counts, recent
+// releases) come from GitHub at build time, see src/lib/releases.ts.
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import elkins from '../assets/shots/elkins-3d-map.webp';
 import bridges from '../assets/shots/bridges-dashboard.webp';
 import water from '../assets/shots/water-quality-dashboard.webp';
-import {
-  CURRENT_VERSION,
-  DEMO_URL,
-  QGIS_PLUGIN_URL,
-  RECENT_RELEASES,
-  REPO_URL,
-  repoFile,
-} from '../lib/site';
+import { DEMO_URL, QGIS_PLUGIN_URL, REPO_URL, repoFile } from '../lib/site';
+import { getReleaseData } from '../lib/releases';
+
+const releases = await getReleaseData();
 
 const shotFormats = ['avif', 'webp'] as const;
 const bandWidths = [600, 900, 1200];
@@ -23,7 +20,7 @@ const bandSizes = '(min-width: 1200px) 560px, (min-width: 900px) 46vw, 100vw';
 
 <Base path="/">
   <section class="wrap hero" aria-labelledby="hero-title">
-    <p class="eyebrow plain">Open source GIS portal · AGPL-3.0 · v{CURRENT_VERSION}</p>
+    <p class="eyebrow plain">Open source GIS portal · AGPL-3.0 · v{releases.currentVersion}</p>
     <h1 id="hero-title">Your maps, your data, your servers.</h1>
     <p class="lead">
       GratisGIS is a self-hosted GIS portal: web maps, PostGIS data layers, forms, dashboards and an
@@ -61,11 +58,14 @@ const bandSizes = '(min-width: 1200px) 560px, (min-width: 900px) 46vw, 100vw';
     <dl class="wrap facts-grid">
       <div>
         <dt>1.0 shipped</dt>
-        <dd>October 31, 2026. Now on v{CURRENT_VERSION} with semantic versioning.</dd>
+        <dd>
+          <time datetime={releases.v1IsoDate}>{releases.v1Date}</time>. Now on v{releases.currentVersion} with
+          semantic versioning.
+        </dd>
       </div>
       <div>
-        <dt>100+ releases</dt>
-        <dd>Since July 2026. Each one has a public changelog entry.</dd>
+        <dt>{releases.releaseCount} releases</dt>
+        <dd>Since {releases.firstReleaseMonth}. Each one has a public changelog entry.</dd>
       </div>
       <div>
         <dt>4 OGC APIs</dt>
@@ -331,7 +331,7 @@ const bandSizes = '(min-width: 1200px) 560px, (min-width: 900px) 46vw, 100vw';
       </div>
       <ul class="release-grid">
         {
-          RECENT_RELEASES.map((r) => (
+          releases.recent.map((r) => (
             <li>
               <p class="meta">
                 <a href={`${REPO_URL}/releases/tag/v${r.version}`}>v{r.version}</a> ·{' '}
