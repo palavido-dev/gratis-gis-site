@@ -518,44 +518,6 @@ main:focus {
   color: var(--muted-2);
 }
 
-.numbers {
-  padding-top: 72px;
-}
-
-.numbers-label {
-  font-size: 14px;
-  color: var(--muted-2);
-}
-
-.numbers dl {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  margin: 18px 0 0;
-  border-top: 1px solid var(--line);
-}
-
-.numbers dl > div {
-  padding: 20px 20px 20px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.numbers dt {
-  font-family: var(--serif);
-  font-size: 40px;
-  line-height: 1;
-}
-
-.numbers dd {
-  margin: 6px 0 0;
-  color: var(--muted);
-}
-
-.numbers .note {
-  margin-top: 14px;
-  font-size: 14px;
-  color: var(--muted-2);
-}
-
 .section {
   padding-top: 96px;
   padding-bottom: 24px;
