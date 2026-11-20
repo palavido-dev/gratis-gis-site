@@ -606,8 +606,41 @@ main:focus {
 }
 
 @media (max-width: 560px) {
-  .steps {
+  .steps:not(.steps-shots) {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Phone screenshots: three across at every width, so the sequence
+   reads left to right even on a phone. */
+.steps-shots {
+  gap: 10px;
+}
+
+.steps-shots li {
+  padding: 10px 10px 14px;
+}
+
+.steps-shots .phone {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 560px) {
+  .steps-shots li {
+    padding: 6px 6px 10px;
+  }
+
+  .steps-shots .when {
+    font-size: 12px;
+  }
+
+  .steps-shots strong {
+    font-size: 14px;
   }
 }
 
