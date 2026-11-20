@@ -16,7 +16,15 @@ import water from '../assets/shots/water-quality-dashboard.webp';
 import fieldDownload from '../assets/shots/field-offline-download.webp';
 import fieldCollect from '../assets/shots/field-offline-collect.webp';
 import fieldSync from '../assets/shots/field-offline-sync.webp';
-import { DEMO_URL, QGIS_PLUGIN_URL, REPO_URL, repoFile } from '../lib/site';
+import {
+  DEMO_URL,
+  LICENSE_URL,
+  MAINTAINER,
+  REPO_URL,
+  SITE_DESCRIPTION,
+  SITE_URL,
+  repoFile,
+} from '../lib/site';
 import { getReleaseData } from '../lib/releases';
 
 const releases = await getReleaseData();
@@ -108,9 +116,52 @@ const faq = [
     a: 'Matt Palavido maintains GratisGIS and reviews every change before it merges. Bug reports and pull requests are welcome on GitHub, and questions go to GitHub Discussions.',
   },
 ];
+
+// Structured data for search engines: what the software is and the
+// questions answered on this page. Same facts as the visible copy.
+const jsonLd = [
+  {
+    '@type': 'SoftwareApplication',
+    '@id': `${SITE_URL}/#software`,
+    name: 'GratisGIS',
+    description: SITE_DESCRIPTION,
+    url: `${SITE_URL}/`,
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: 'Geographic information system (GIS)',
+    operatingSystem: 'Linux, Docker',
+    softwareVersion: releases.currentVersion,
+    dateModified: releases.currentIsoDate,
+    license: LICENSE_URL,
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    downloadUrl: REPO_URL,
+    installUrl: `${SITE_URL}/install/`,
+    screenshot: `${SITE_URL}/og.png`,
+    featureList: [
+      'Web maps',
+      'PostGIS data layers',
+      'Forms',
+      'Dashboards and an app builder',
+      'Offline field data collection',
+      'OGC API Features, Tiles, Styles and Records',
+      'QGIS plugin',
+    ],
+    author: { '@type': 'Person', name: MAINTAINER },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+  },
+  {
+    '@type': 'FAQPage',
+    '@id': `${SITE_URL}/#faq`,
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  },
+];
 ---
 
-<Base path="/">
+<Base path="/" jsonLd={jsonLd}>
   <section class="hero" aria-labelledby="hero-title">
     <svg class="hero-contours" aria-hidden="true" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMid slice">
       <g fill="none" stroke="var(--contour)" stroke-width="1.2">
@@ -196,6 +247,7 @@ const faq = [
           range. The field app runs in the phone’s browser, so there is nothing to install from an
           app store.
         </p>
+        <a class="more" href="/field-data-collection/">How offline field collection works</a>
       </div>
       <div class="story-media">
         <ol class="steps steps-shots">
@@ -252,7 +304,7 @@ const faq = [
           desktop tool they already know. Other tools read the same layers through open standards,
           with no custom connector.
         </p>
-        <a class="more" href={QGIS_PLUGIN_URL}>Get the QGIS plugin</a>
+        <a class="more" href="/qgis/">What the QGIS plugin does</a>
       </div>
       <div class="story-media">
         <ul class="standards" aria-label="Open standards the portal serves">
@@ -298,6 +350,9 @@ const faq = [
         If you rely on Survey123’s advanced features, Experience Builder, or enterprise single
         sign-on beyond OpenID Connect, stay where you are for now. Better to know that before you
         install anything.
+      </p>
+      <p class="caveat">
+        <a href="/arcgis-online-alternative/">The longer comparison, and how to move content over</a>
       </p>
     </div>
   </section>

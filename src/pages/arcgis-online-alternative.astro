@@ -1,0 +1,131 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Landing page for people searching for an ArcGIS Online alternative.
+// Facts are checked against the home page comparison, the in-portal
+// help ("Coming from ArcGIS Online") and docs/migration/from-arcgis-online.md.
+// Same writing rules as the home page: plain sentences, and say where
+// ArcGIS Online is ahead.
+import Base from '../layouts/Base.astro';
+import { DEMO_URL, repoFile } from '../lib/site';
+
+const terms = [
+  ['Hosted feature layer, feature service', 'Data layer', 'Stored in PostgreSQL with PostGIS on your server.'],
+  ['Web map', 'Map', 'Layers, a basemap and a starting view.'],
+  ['Dashboard', 'Web app', 'Dashboards are web app layouts that read live from data layers.'],
+  ['Experience Builder or Web AppBuilder app', 'Web app', 'A widget layout builder. Not a drop-in replacement.'],
+  ['Survey123 survey', 'Form', 'Imports XLSForm. Not a drop-in replacement.'],
+  ['Field Maps', 'Data collection and the field app', 'Offline capture and sync in the phone’s browser.'],
+  ['Coded value domain', 'Pick list', 'Shared across layers and forms.'],
+  ['Publisher role', 'Contributor role', 'Viewer, Data editor, User and Admin keep their names.'],
+  ['Credits', 'None', 'Nothing is metered. You run the server.'],
+];
+---
+
+<Base
+  title="Open source ArcGIS Online alternative | GratisGIS"
+  description="A free, open source alternative to ArcGIS Online that runs on your own server. See what matches, what does not, and how to move your content over."
+  path="/arcgis-online-alternative/"
+  breadcrumbs={[{ name: 'ArcGIS Online alternative', path: '/arcgis-online-alternative/' }]}
+>
+  <article class="wrap prose">
+    <p class="eyebrow">Compared with ArcGIS Online</p>
+    <h1>An open source alternative to ArcGIS Online</h1>
+    <p>
+      GratisGIS is a GIS portal you install on your own Linux server. It covers the everyday work
+      most teams use ArcGIS Online for: web maps, hosted data layers, sharing, forms, dashboards and
+      offline field collection. It is free and open source under the AGPL, so there are no named
+      users, no user types and no credits. This page says what lines up, what does not, and how to
+      bring content across.
+    </p>
+
+    <h2>What you get</h2>
+    <ul>
+      <li>
+        <strong>Maps and data layers.</strong> Upload a shapefile, GeoPackage, file geodatabase,
+        GeoJSON or anything else GDAL reads. Style it, set popups, and share it by group,
+        organization or public link.
+      </li>
+      <li>
+        <strong>Dashboards and web apps.</strong> Counters, charts, lists and maps that filter
+        together and read live from the layer.
+      </li>
+      <li>
+        <strong>Forms and field collection.</strong> A form builder, and an{' '}
+        <a href="/field-data-collection/">offline field app</a> that runs in the phone’s browser.
+      </li>
+      <li>
+        <strong>Open standards.</strong> Every layer is served through OGC API Features and Tiles,
+        so <a href="/qgis/">QGIS</a> and other tools read it with no connector.
+      </li>
+      <li>
+        <strong>Your own sign-in.</strong> Accounts live in Keycloak on your server, with OpenID
+        Connect for single sign-on.
+      </li>
+    </ul>
+
+    <h2>The same things under different names</h2>
+    <p>If you know ArcGIS Online, most of GratisGIS will be familiar. A few names changed.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="ArcGIS Online terms and GratisGIS terms">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">In ArcGIS Online</th>
+            <th scope="col">In GratisGIS</th>
+            <th scope="col">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            terms.map(([them, us, note]) => (
+              <tr>
+                <td>{them}</td>
+                <th scope="row">{us}</th>
+                <td>{note}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Moving content from ArcGIS Online</h2>
+    <p>
+      An admin can run the importer from Admin, Migrations, From ArcGIS Online. It copies hosted
+      feature layers into data layers on your server and rewrites your web maps to use them. You
+      can also export a layer as GeoJSON, a file geodatabase or a shapefile and upload the file.
+    </p>
+    <p>
+      The importer does not bring over apps, dashboards or surveys. Those you rebuild. The{' '}
+      <a href={repoFile('docs/migration/from-arcgis-online.md')}>migration guide</a> lists each
+      step and what survives the trip. Start with one team and one project before you move
+      everything.
+    </p>
+
+    <h2>Where ArcGIS Online is ahead</h2>
+    <p>Esri has had decades to build its platform. Stay with ArcGIS Online for now if you rely on:</p>
+    <ul>
+      <li>Survey123’s advanced features, or Experience Builder apps you cannot rebuild.</li>
+      <li>Story maps, hosted notebooks, or built-in routing and geoenrichment services.</li>
+      <li>Native iOS and Android field apps. The GratisGIS field app runs in the browser.</li>
+      <li>Enterprise single sign-on beyond OpenID Connect.</li>
+      <li>A large network of training, partners and support contracts.</li>
+    </ul>
+
+    <h2>What it costs</h2>
+    <p>
+      The software is free. You pay for the server and the time to look after it. The public demo
+      runs on 4 CPU cores and 8 GB of RAM, and adding people costs nothing. Installing is one
+      command on a Linux server with Docker. See the <a href="/install/">install guide</a>.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary btn-lg" href={DEMO_URL}>Open the demo</a>
+      <a class="btn btn-secondary btn-lg" href="/install/">Read the install guide</a>
+    </div>
+
+    <p class="fineprint">
+      GratisGIS is an independent open source project. It is not affiliated with or endorsed by
+      Esri. ArcGIS, ArcGIS Online, Survey123 and Experience Builder are trademarks of Esri.
+    </p>
+  </article>
+</Base>

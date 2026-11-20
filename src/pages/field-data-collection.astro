@@ -1,0 +1,135 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Landing page for offline field data collection. Facts are checked
+// against the in-portal help page "Data collection" and the public
+// demo. The screenshots are the installed field app on an iPhone.
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import fieldDownload from '../assets/shots/field-offline-download.webp';
+import fieldCollect from '../assets/shots/field-offline-collect.webp';
+import fieldSync from '../assets/shots/field-offline-sync.webp';
+import { DEMO_URL } from '../lib/site';
+
+const steps = [
+  {
+    when: 'Before leaving',
+    what: 'Download an area',
+    src: fieldDownload,
+    alt: 'The field app on a phone saying the deployment is ready for offline, with 3 layers, 54 features, 1 form and 2 pick lists cached.',
+  },
+  {
+    when: 'In the field',
+    what: 'Collect without signal',
+    src: fieldCollect,
+    alt: 'A road and trail issue report form filled in on a phone in airplane mode, with a large Submit button at the bottom.',
+  },
+  {
+    when: 'Back in range',
+    what: 'Edits sync on their own',
+    src: fieldSync,
+    alt: 'The field map back online, with a Sync 1 button in the header for the edit made offline.',
+  },
+];
+---
+
+<Base
+  title="Offline field data collection app, open source | GratisGIS"
+  description="Collect GIS data offline on any phone: download an area, capture points, photos and forms without signal, sync later. Open source, no per-user licenses."
+  path="/field-data-collection/"
+  breadcrumbs={[{ name: 'Offline field data collection', path: '/field-data-collection/' }]}
+>
+  <article class="wrap prose">
+    <p class="eyebrow">Field app</p>
+    <h1>Offline field data collection without per-user licenses</h1>
+    <p>
+      GratisGIS includes a field app for collecting GIS data on a phone or tablet, with or without
+      signal. It runs in the phone’s browser and can be added to the home screen, so there is
+      nothing to install from an app store. Every collector signs in with their own account, and
+      adding collectors costs nothing.
+    </p>
+
+    <ol class="steps steps-shots">
+      {
+        steps.map((step) => (
+          <li>
+            <Picture
+              src={step.src}
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
+              widths={[240, 360, 480]}
+              sizes="(min-width: 900px) 240px, 31vw"
+              alt={step.alt}
+              class="phone"
+            />
+            <span class="when">{step.when}</span>
+            <strong>{step.what}</strong>
+          </li>
+        ))
+      }
+    </ol>
+
+    <h2>How it works</h2>
+    <ol>
+      <li>
+        <strong>Set up a deployment at your desk.</strong> Pick a map, mark which layers the crew
+        can edit, and attach a form to each one if you want something other than the default.
+      </li>
+      <li>
+        <strong>Hand it to the crew.</strong> Send a link or show the QR code. They open it on
+        their own phone and sign in.
+      </li>
+      <li>
+        <strong>Download before leaving.</strong> One tap saves the layers, forms, pick lists and
+        the map for the work area onto the phone.
+      </li>
+      <li>
+        <strong>Collect all day.</strong> Add points, lines and areas, fill in the form and attach
+        photos. Edits wait in a queue on the phone while there is no signal.
+      </li>
+      <li>
+        <strong>Sync when back in range.</strong> Queued edits upload to the data layer, where
+        maps and dashboards pick them up right away.
+      </li>
+    </ol>
+
+    <h2>Built for use outdoors</h2>
+    <ul>
+      <li>Large text and buttons, in light and dark mode, using the phone’s own system font.</li>
+      <li>
+        The collect, locate and layers buttons sit together within reach of one thumb. A setting
+        moves them to the left for left-handed use.
+      </li>
+      <li>A GPS accuracy readout, so the crew knows how good a position is before saving it.</li>
+      <li>A count of edits waiting to sync, always visible in the header.</li>
+    </ul>
+
+    <h2>Forms</h2>
+    <p>
+      Each editable layer gets a form built from its fields, or you can design your own in the
+      form builder with required questions, pick lists and photos. The form builder imports
+      XLSForm, so existing surveys do not have to be retyped.
+    </p>
+
+    <h2>Your data stays yours</h2>
+    <p>
+      Collected features go straight into PostgreSQL with PostGIS on your own server. They are
+      readable in <a href="/qgis/">QGIS</a> and through standard OGC APIs the moment they sync.
+    </p>
+
+    <h2>What it is not</h2>
+    <p>
+      The field app is a web app, not a native iOS or Android app, and it is not a drop-in
+      replacement for ArcGIS Field Maps or Survey123. If you depend on external GNSS receiver
+      integration or Survey123’s advanced form logic, test your workflow on the demo first. The{' '}
+      <a href="/arcgis-online-alternative/">comparison with ArcGIS Online</a> covers the rest.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary btn-lg" href={`${DEMO_URL}/field`}>Try the field app on your phone</a>
+      <a class="btn btn-secondary btn-lg" href="/install/">Read the install guide</a>
+    </div>
+    <p class="fineprint">
+      The demo’s sign-in page lists shared test accounts. Everything on it resets each night.
+    </p>
+  </article>
+</Base>
