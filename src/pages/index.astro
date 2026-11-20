@@ -13,6 +13,9 @@ import Base from '../layouts/Base.astro';
 import elkins from '../assets/shots/elkins-3d-map.webp';
 import bridges from '../assets/shots/bridges-dashboard.webp';
 import water from '../assets/shots/water-quality-dashboard.webp';
+import fieldDownload from '../assets/shots/field-offline-download.webp';
+import fieldCollect from '../assets/shots/field-offline-collect.webp';
+import fieldSync from '../assets/shots/field-offline-sync.webp';
 import { DEMO_URL, QGIS_PLUGIN_URL, REPO_URL, repoFile } from '../lib/site';
 import { getReleaseData } from '../lib/releases';
 
@@ -21,6 +24,29 @@ const releases = await getReleaseData();
 const shotFormats = ['avif', 'webp'] as const;
 const storyWidths = [600, 900, 1200];
 const storySizes = '(min-width: 1200px) 640px, (min-width: 900px) 52vw, 100vw';
+
+// Screenshots of the installed field app on an iPhone, taken on the
+// public demo. The middle one is in airplane mode.
+const fieldSteps = [
+  {
+    when: 'Before leaving',
+    what: 'Download an area',
+    src: fieldDownload,
+    alt: 'The field app on a phone saying the deployment is ready for offline, with 3 layers, 54 features, 1 form and 2 pick lists cached.',
+  },
+  {
+    when: 'In the field',
+    what: 'Collect without signal',
+    src: fieldCollect,
+    alt: 'A road and trail issue report form filled in on a phone in airplane mode, with a large Submit button at the bottom.',
+  },
+  {
+    when: 'Back in range',
+    what: 'Edits sync on their own',
+    src: fieldSync,
+    alt: 'The field map back online, with a Sync 1 button in the header for the edit made offline.',
+  },
+];
 
 const comparison = [
   {
@@ -172,10 +198,24 @@ const faq = [
         </p>
       </div>
       <div class="story-media">
-        <ol class="steps">
-          <li><span class="when">Before leaving</span><strong>Download an area</strong></li>
-          <li><span class="when">In the field</span><strong>Collect without signal</strong></li>
-          <li><span class="when">Back in range</span><strong>Edits sync on their own</strong></li>
+        <ol class="steps steps-shots">
+          {
+            fieldSteps.map((step) => (
+              <li>
+                <Picture
+                  src={step.src}
+                  formats={[...shotFormats]}
+                  fallbackFormat="webp"
+                  widths={[240, 360, 480]}
+                  sizes="(min-width: 1200px) 200px, (min-width: 900px) 17vw, 31vw"
+                  alt={step.alt}
+                  class="phone"
+                />
+                <span class="when">{step.when}</span>
+                <strong>{step.what}</strong>
+              </li>
+            ))
+          }
         </ol>
       </div>
     </div>
