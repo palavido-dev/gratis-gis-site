@@ -18,7 +18,7 @@ pnpm sync:releases  # refresh src/data/releases.json from GitHub
 
 ## Release facts
 
-The current version, the recent releases, the release count and the 1.0 date on the home page come from the [GitHub releases](https://github.com/palavido-dev/gratis-gis/releases) of the main repository, read at build time (`src/lib/releases.ts`). `GITHUB_TOKEN` is used when set. If the API cannot be reached, the build logs a warning and uses the committed snapshot in `src/data/releases.json`. Run `pnpm sync:releases` and commit the result to refresh it.
+The current version and the 1.0 date on the home page come from the [GitHub releases](https://github.com/palavido-dev/gratis-gis/releases) of the main repository, read at build time (`src/lib/releases.ts`). `GITHUB_TOKEN` is used when set. If the API cannot be reached, the build logs a warning and uses the committed snapshot in `src/data/releases.json`. Run `pnpm sync:releases` and commit the result to refresh it.
 
 ## Deploy
 
