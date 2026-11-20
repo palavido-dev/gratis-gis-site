@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Home page. Facts here are checked against README.md, CHANGELOG.md,
 // the code and the public demo's sample workspace. Release facts
-// (version, dates, counts) come from GitHub at build time, see
+// (version and dates) come from GitHub at build time, see
 // src/lib/releases.ts.
 //
 // Writing rules for this page: plain sentences, real nouns and
@@ -329,8 +329,8 @@ const faq = [
         <p class="release-line">
           Latest release{' '}
           <a href={`${REPO_URL}/releases/tag/v${releases.currentVersion}`}>v{releases.currentVersion}</a>,{' '}
-          <time datetime={releases.currentIsoDate}>{releases.currentDate}</time>. {releases.releaseCount}{' '}
-          releases since {releases.firstReleaseMonth}, each with <a href={repoFile('CHANGELOG.md')}>public notes</a>.
+          <time datetime={releases.currentIsoDate}>{releases.currentDate}</time>. Every release has{' '}
+          <a href={repoFile('CHANGELOG.md')}>public notes</a>.
         </p>
         <h2 id="closing-title">Look around the demo before you install anything.</h2>
       </div>
