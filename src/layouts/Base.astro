@@ -11,7 +11,7 @@ import '@fontsource/ibm-plex-mono/latin-500.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '../lib/site';
+import { REPO_URL, SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '../lib/site';
 
 interface Props {
   title?: string;
@@ -19,6 +19,13 @@ interface Props {
   /** Path for the canonical URL, e.g. "/install/". */
   path?: string;
   noindex?: boolean;
+  /**
+   * Trail for a subpage, home first is added for you. Renders a
+   * BreadcrumbList for search engines. Example: [{ name: 'Install', path: '/install/' }].
+   */
+  breadcrumbs?: Array<{ name: string; path: string }>;
+  /** Extra schema.org nodes for this page, merged into one @graph. */
+  jsonLd?: Array<Record<string, unknown>>;
 }
 
 const {
@@ -26,10 +33,63 @@ const {
   description = SITE_DESCRIPTION,
   path = '/',
   noindex = false,
+  breadcrumbs = [],
+  jsonLd = [],
 } = Astro.props;
 
 const canonical = new URL(path, SITE_URL).href;
 const ogImage = new URL('/og.png', SITE_URL).href;
+
+// Structured data. Every page names the site and its publisher, so a
+// search engine can tie the pages together. Pages add their own nodes
+// (the software, the FAQ) through the jsonLd prop.
+const orgId = `${SITE_URL}/#organization`;
+const siteId = `${SITE_URL}/#website`;
+const graph: Array<Record<string, unknown>> = [
+  {
+    '@type': 'Organization',
+    '@id': orgId,
+    name: 'GratisGIS',
+    url: `${SITE_URL}/`,
+    logo: new URL('/apple-touch-icon.png', SITE_URL).href,
+    sameAs: [REPO_URL, 'https://plugins.qgis.org/plugins/gratisgis_qgis/'],
+  },
+  {
+    '@type': 'WebSite',
+    '@id': siteId,
+    name: 'GratisGIS',
+    url: `${SITE_URL}/`,
+    description: SITE_DESCRIPTION,
+    inLanguage: 'en',
+    publisher: { '@id': orgId },
+  },
+  {
+    '@type': 'WebPage',
+    '@id': `${canonical}#webpage`,
+    url: canonical,
+    name: title,
+    description,
+    inLanguage: 'en',
+    isPartOf: { '@id': siteId },
+  },
+];
+if (breadcrumbs.length > 0) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    itemListElement: [{ name: 'GratisGIS', path: '/' }, ...breadcrumbs].map((crumb, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: crumb.name,
+      item: new URL(crumb.path, SITE_URL).href,
+    })),
+  });
+}
+graph.push(...jsonLd);
+// "<" escaped so no string value can close the script element.
+const structuredData = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(
+  /</g,
+  '\\u003c',
+);
 ---
 
 <!doctype html>
@@ -39,12 +99,23 @@ const ogImage = new URL('/og.png', SITE_URL).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {
+      noindex ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="canonical" href={canonical} />
+          <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+        </>
+      )
+    }
     <meta name="theme-color" content="#F4F2EC" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="GratisGIS" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -54,6 +125,10 @@ const ogImage = new URL('/og.png', SITE_URL).href;
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="GratisGIS. A GIS portal your organization owns." />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    {!noindex && <script type="application/ld+json" set:html={structuredData} />}
     <slot name="head" />
   </head>
   <body>

@@ -8,9 +8,12 @@ export const DEMO_URL = 'https://demo.gratisgis.org';
 export const REPO_URL = 'https://github.com/palavido-dev/gratis-gis';
 export const QGIS_PLUGIN_URL = 'https://github.com/palavido-dev/gratis-gis-qgis';
 
-export const SITE_TITLE = 'GratisGIS: self-hosted, open source GIS portal';
+export const SITE_TITLE = 'GratisGIS: open source, self-hosted alternative to ArcGIS Online';
 export const SITE_DESCRIPTION =
   'GratisGIS is an open source GIS portal you run on your own server: web maps, data layers, forms, dashboards and an offline field app, with no per-user fees.';
+
+export const LICENSE_URL = 'https://www.gnu.org/licenses/agpl-3.0.html';
+export const MAINTAINER = 'Matt Palavido';
 
 /** A file or folder in the main repository, on the main branch. */
 export function repoFile(path: string): string {
