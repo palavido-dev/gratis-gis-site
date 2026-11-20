@@ -22,15 +22,6 @@ const shotFormats = ['avif', 'webp'] as const;
 const storyWidths = [600, 900, 1200];
 const storySizes = '(min-width: 1200px) 640px, (min-width: 900px) 52vw, 100vw';
 
-// Counts from the Randolph County, West Virginia sample workspace on
-// the public demo (the same data as "Load sample data" in the app).
-const demoNumbers = [
-  { value: '23,915', label: 'tax parcels' },
-  { value: '188', label: 'highway bridges with condition ratings' },
-  { value: '285,788', label: 'water quality readings, 1995 to 2019' },
-  { value: '30 years', label: 'of county storm events' },
-];
-
 const comparison = [
   {
     topic: 'Where it runs',
@@ -135,28 +126,12 @@ const faq = [
       <figcaption>
         <span>Elkins, West Virginia. Every mapped building at the height measured by a 2018 lidar flight.</span>
         <a href={DEMO_URL}>Open the demo, no sign-in needed to view it</a>
+        <span>
+          Shared test accounts are on the demo’s sign-in page. Everything resets each night, so try
+          whatever you like.
+        </span>
       </figcaption>
     </figure>
-  </section>
-
-  <section class="wrap numbers" aria-labelledby="numbers-label">
-    <p class="numbers-label" id="numbers-label">
-      What is loaded in the public demo, from Randolph County, West Virginia
-    </p>
-    <dl>
-      {
-        demoNumbers.map((n) => (
-          <div>
-            <dt>{n.value}</dt>
-            <dd>{n.label}</dd>
-          </div>
-        ))
-      }
-    </dl>
-    <p class="note">
-      Shared test accounts are on the demo’s sign-in page. Everything resets each night, so try
-      whatever you like.
-    </p>
   </section>
 
   <section class="wrap section" id="tour" aria-labelledby="tour-title">
