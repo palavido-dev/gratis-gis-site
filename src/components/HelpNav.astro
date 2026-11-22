@@ -1,0 +1,43 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Sidebar tree for the help pages. Categories are <details> so the
+// tree works without JavaScript; the one holding the current page
+// starts open.
+import { helpPath, type HelpNavNode } from '../lib/help/content';
+
+interface Props {
+  nav: HelpNavNode;
+  activeSlug: string;
+  depth?: number;
+}
+
+const { nav, activeSlug, depth = 0 } = Astro.props;
+
+function contains(node: HelpNavNode, slug: string): boolean {
+  return node.slug === slug || node.children.some((c) => contains(c, slug));
+}
+---
+
+<ul class={`docs-nav docs-nav-${depth}`}>
+  {
+    nav.children.map((node) =>
+      node.slug !== undefined ? (
+        <li>
+          <a
+            href={helpPath(node.slug)}
+            aria-current={node.slug === activeSlug ? 'page' : undefined}
+          >
+            {node.label}
+          </a>
+        </li>
+      ) : (
+        <li>
+          <details open={contains(node, activeSlug)}>
+            <summary>{node.label}</summary>
+            <Astro.self nav={node} activeSlug={activeSlug} depth={depth + 1} />
+          </details>
+        </li>
+      ),
+    )
+  }
+</ul>

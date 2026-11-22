@@ -25,6 +25,7 @@ export function repoFile(path: string): string {
  * page sends a browser on one of these to the same path on the demo,
  * so old links to gratisgis.org/items/... keep working after the
  * portal moves. Keep in sync with apps/portal-web/src/app.
+ * /help is not here: the help is published on this site.
  */
 export const PORTAL_PATH_PREFIXES = [
   'admin',
@@ -35,7 +36,6 @@ export const PORTAL_PATH_PREFIXES = [
   'field',
   'forms',
   'groups',
-  'help',
   'items',
   'maps',
   'print',

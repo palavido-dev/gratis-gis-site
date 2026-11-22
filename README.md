@@ -14,11 +14,20 @@ pnpm dev      # local server with reload
 pnpm check    # type check
 pnpm build    # static output in dist/
 pnpm sync:releases  # refresh src/data/releases.json from GitHub
+pnpm sync:help      # refresh help/ from the main repository
 ```
 
 ## Release facts
 
 The current version and the 1.0 date on the home page come from the [GitHub releases](https://github.com/palavido-dev/gratis-gis/releases) of the main repository, read at build time (`src/lib/releases.ts`). `GITHUB_TOKEN` is used when set. If the API cannot be reached, the build logs a warning and uses the committed snapshot in `src/data/releases.json`. Run `pnpm sync:releases` and commit the result to refresh it.
+
+## Help pages
+
+`/help/` is built from the help docs in the main repository (`apps/portal-web/content/help`), the same files every portal shows under Help. Edit the help there, not here. `pnpm sync:help` copies the docs into `help/content`, the screenshots into `public/help` and the Markdown renderer into `src/lib/help/markdown.ts`, and records the source commit in `help/source.json`. Set `HELP_SOURCE=../gratis-gis` to copy from a local checkout, or `HELP_REF` for a tag or branch.
+
+Pushes to `main` and the scheduled build refresh the copy before building, so help changes in the main repository reach the site within 6 hours. Pull requests build the committed copy. Commit a fresh copy now and then so the fallback stays close.
+
+Portals name these pages as the canonical copy of their help, and the demo keeps its own copy out of search.
 
 ## Deploy
 

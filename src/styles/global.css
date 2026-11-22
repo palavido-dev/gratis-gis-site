@@ -262,6 +262,13 @@ p {
   }
 }
 
+@media (max-width: 420px) {
+  .nav-links {
+    gap: 0 13px;
+    font-size: 14px;
+  }
+}
+
 /* Hero */
 .cta-row {
   display: flex;
@@ -919,4 +926,296 @@ main:focus {
   margin-top: 28px;
   font-size: 14px;
   color: var(--muted-2);
+}
+
+/* Help pages (/help/) */
+.docs {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 56px;
+  padding-top: 48px;
+  padding-bottom: 96px;
+}
+
+.docs-aside {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  font-size: 15px;
+}
+
+.docs-aside-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.docs-jump {
+  display: none;
+}
+
+.docs-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.docs-nav .docs-nav {
+  margin: 4px 0 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+
+.docs-nav li {
+  margin: 0;
+}
+
+.docs-nav summary {
+  cursor: pointer;
+  padding: 5px 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.docs-nav-1 summary,
+.docs-nav-2 summary {
+  font-weight: 500;
+}
+
+.docs-nav a {
+  display: block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--muted);
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+.docs-nav a:hover {
+  color: var(--accent);
+}
+
+.docs-nav a[aria-current='page'] {
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.docs-article {
+  max-width: 780px;
+}
+
+.docs-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.docs-article h1 {
+  font-size: clamp(32px, 4.5vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.docs-article .lead {
+  margin-top: 14px;
+}
+
+.docs-level {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 2px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 13px;
+  text-transform: capitalize;
+  color: var(--muted);
+}
+
+.docs-callout {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  font-size: 16px;
+}
+
+.docs-body {
+  margin-top: 8px;
+}
+
+.docs-body h2,
+.docs-related h2,
+.docs-sections h2 {
+  margin-top: 44px;
+  font-size: 26px;
+  line-height: 1.25;
+}
+
+.docs-body h3 {
+  margin-top: 32px;
+  font-size: 21px;
+}
+
+.docs-body h4 {
+  margin: 24px 0 0;
+  font-size: 17px;
+}
+
+.docs-body p,
+.docs-body li {
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.docs-body p {
+  margin-top: 16px;
+}
+
+.docs-body ul,
+.docs-body ol {
+  margin: 16px 0 0;
+  padding-left: 22px;
+}
+
+.docs-body li + li {
+  margin-top: 6px;
+}
+
+.docs-body li > ul,
+.docs-body li > ol {
+  margin-top: 6px;
+}
+
+.docs-body code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: var(--bg-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.docs-body pre {
+  margin: 20px 0 0;
+  padding: 16px;
+  overflow-x: auto;
+  background: var(--dark);
+  color: var(--dark-ink);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.docs-body pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.docs-body blockquote {
+  margin: 20px 0 0;
+  padding: 2px 16px 14px;
+  border-left: 3px solid var(--line-strong);
+  color: var(--muted);
+}
+
+.docs-body img {
+  display: block;
+  margin-top: 20px;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.docs-body table {
+  display: block;
+  margin-top: 20px;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.docs-body th,
+.docs-body td {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.docs-body th {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.docs-body hr {
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.docs-related ul,
+.docs-sections ul {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.docs-related li,
+.docs-sections li {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.docs-related li a,
+.docs-sections li a {
+  font-weight: 600;
+}
+
+.docs-related li span,
+.docs-sections li span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.docs-foot {
+  margin-top: 56px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 15px;
+}
+
+@media (max-width: 900px) {
+  .docs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-top: 24px;
+  }
+  .docs-aside {
+    position: static;
+    max-height: none;
+    order: 2;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .docs-jump {
+    display: inline-block;
+    margin-bottom: 16px;
+    font-size: 15px;
+  }
 }

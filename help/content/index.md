@@ -1,0 +1,69 @@
+---
+id: help-landing
+title: Welcome to GratisGIS Help
+seoTitle: "GratisGIS help and documentation"
+summary: "Documentation for GratisGIS, the open source, self-hosted GIS portal: getting started, maps, data layers, forms, web apps, analysis and admin."
+order: 0
+---
+
+GratisGIS is an open-source, self-hosted GIS portal for publishing
+datasets, web maps, forms, and dashboards. This documentation is
+organized one concept per page: when you want to know how Buffer
+works, the Buffer page shows you how to Buffer. Not how to dissolve,
+then centroid, then buffer.
+
+## How to use this site
+
+The help landing page is the hub. Pick a **task** (new here, publish,
+collect, analyze, build apps, automate, admin) or browse by area in
+the sidebar. Use the **search box** at the top of the sidebar to jump
+to a specific topic.
+
+Every page has the same shape:
+
+- **Title and one-line summary** at the top.
+- **Prerequisites** callout if there's something you need to know first.
+- **The thing itself**. Explained from a clean start, no assumed
+ surrounding workflow.
+- **Screenshots** next to every UI control or multi-step process.
+- **See also** at the bottom for related topics.
+
+## How the catalog is grouped
+
+- **Getting started**. Orientation, first map, sharing, uploads, and
+  Coming from ArcGIS.
+- **Items**. Maps & apps, data, field & forms, organize, advanced.
+- **Map editing**. Symbology, labels, filters, popups, markup,
+  comments, and live presence.
+- **Forms**. Form designer, question types, conditional logic, XLSForm.
+- **Web apps**. Custom app, templates, themes, and widgets.
+- **Print templates**. Page layout and parameters.
+- **Analysis**. Derived-layer steps grouped by job: select & calculate,
+  proximity, overlay, geometry, summarize, generate.
+- **Admin**. Users, sign-in, landing page, backups and cleanup, all from the admin home.
+- **Reference**. Item types, expressions, API keys, Python, scripts,
+  HTTP API, MCP, citations.
+
+## Automating the portal
+
+Anything you can do in the browser you can do from a script, using the
+same API and the same permissions.
+
+- [API keys](/help/reference/api-keys): how something other than a
+  browser signs in.
+- [Python client](/help/reference/python-client): read, filter, buffer,
+  create, and export a layer, with worked examples.
+- [Scripts](/help/reference/scripts): run that Python on the portal
+  itself, on a schedule.
+- [The HTTP API](/help/reference/api): the routes underneath, for other
+  languages.
+- [MCP server](/help/reference/mcp-server): plug an MCP-compatible AI
+  client into the same API (read tools, plus optional write tools).
+- [Cite a public item](/help/reference/cite-an-item): BibTeX, RIS, and
+  Schema.org JSON-LD downloads.
+
+## Opening rasters from QGIS
+
+Stock QGIS 3.42+ can point **Data Source Manager → STAC** at
+`/api/public/stac` and browse public rasters without the GratisGIS
+plugin. See **Browse public rasters from QGIS with STAC**.

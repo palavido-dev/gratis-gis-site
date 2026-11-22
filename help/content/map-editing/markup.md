@@ -1,0 +1,142 @@
+---
+id: map-editing-markup
+title: Markup and redlining
+seoTitle: "Markup and redlining on a shared web map"
+summary: "Draw pins, lines, polygons, text and arrows on a shared map to flag issues for the team. Download the markup as GeoJSON or turn it into a data layer."
+category: map-editing
+order: 40
+complexity: basic
+tags:
+  - markup
+  - collaboration
+  - redline
+related:
+  - map-editing-comments
+  - map-editing-presence
+  - items-map
+---
+![Map builder Markup dialog with Add markup](/help/map-editing/markup-panel.png)
+
+Markup is the fastest way to get team feedback on a map. Anyone who
+can view the map can draw on it, group sketches into named markup
+sets, and ship the link back to the team. No editor permission needed.
+
+Signed-in viewers can always add their own markup. Map editors can
+also turn on **Anonymous markup** in Map settings so signed-out
+visitors on a public map can add and edit their own sets (off by
+default, rate-limited). Guests cannot promote a set to a data
+layer — that still needs a signed-in account.
+
+When two signed-in people edit the same markup set at once, the
+portal merges their sketches live (see
+[Live presence](/help/map-editing/presence)). Anonymous markup does not
+use that path.
+
+The classic use case: a project manager opens a shared parcel map,
+spots three parcels with wrong boundaries, sketches the correct
+edges, and emails the map URL to the analyst who can fix the
+underlying data. The analyst sees the manager's markup overlaid on
+the map next to their own work and knows exactly which features to
+look at.
+
+## Opening the Markup panel
+
+In the map editor toolbar, click the pencil icon. The Markup panel
+slides in from the right.
+
+## Adding markup
+
+Click **Add markup**. A new markup set appears, named after you and
+today's date, with an auto-assigned color so two reviewers' markups
+don't clash. Each set is its own overlay of features.
+
+Use the tools on a set, then click the map to draw:
+
+- **Pin**: single click.
+- **Line**: click vertices; double-click or press Enter to finish.
+- **Polygon**: click vertices; double-click or Enter to close.
+- **Text**: click to place, then type the label when prompted.
+- **Arrow**: same as a line; the tip gets a chevron so direction
+  is obvious.
+- **Circle**: click the center, then drag to set the radius (stored
+  as a polygon outline).
+
+**Center** still drops a pin at the current map center when you just
+need a quick marker without switching tools.
+
+## Download as GeoJSON
+
+Click **GeoJSON** on any markup set that has features. Your browser
+downloads a FeatureCollection with every pin, line, polygon, text,
+arrow, and circle in that set. Properties include kind, label, note,
+color, and which markup set / author they came from. Opens directly
+in QGIS, ArcGIS Pro, geojson.io, and similar tools. Anyone who can
+see the set can download it — no edit permission required.
+
+## Promote to a data layer
+
+When a markup set is ready to become real GIS data, click
+**Promote**. GratisGIS creates a private data layer you own, copies
+every feature into it (splitting points, lines, and polygons into
+separate sublayers when the set is mixed), and, if you can edit the
+map, adds that layer to the map for you. The original markup stays
+in place so the review trail is not lost.
+
+## Multiple reviewers, distinct colors
+
+When several people add markup to the same map, each person's set
+gets its own color from a built-in palette. The colors are picked
+so two adjacent ones never look the same, including for common
+forms of color blindness.
+
+You can rename your set (click the title), recolor it (click a
+swatch), or hide it temporarily (eye icon). Hiding only affects
+your own view; the set is still there for everyone else.
+
+## Who can edit which markup
+
+- The author of a markup set can edit or delete it at any time.
+- A map editor (someone with edit permission on the map item) can
+  edit or delete any markup set on that map. This is the cleanup
+  path: an admin can remove abandoned markup from a long-running
+  shared map without asking the author.
+- Other viewers can see all markup sets but can only edit or
+  delete their own.
+- Anonymous guests (when the setting is on) edit only sets they
+  created in the same browser; clearing site cookies loses that
+  edit right, though the markup stays on the map.
+
+## Measurements and dimension labels
+
+The **Measure** tool in the map builder draws a line or an area and
+shows its size. A finished measurement stays selected: drag it to
+move it, drag a corner to reshape it, or drag a midpoint to add a
+corner. The numbers follow every change.
+
+- **Labels on the map.** Each side shows its length and an area shows
+  its size in the middle. Turn **Side lengths** and **Area** on or
+  off in the Measure panel. When sides are too short on screen to fit
+  their labels, some are left out until you zoom in.
+- **Set area.** With an area finished, type a size (for example 10
+  with the unit set to acres) and choose **Apply**. The shape keeps
+  its form and its middle and scales to exactly that size.
+- **Save to markup.** Signed-in users can keep a measurement. It goes
+  into your most recent visible markup set, or a new one, with the
+  labels that were on. The labels are worked out from the shape, so
+  they stay right if the shape changes later.
+
+On a markup set you can edit, the **Lengths** and **Areas** buttons
+turn these labels on or off for every line and shape in the set, not
+only saved measurements.
+
+## Tips
+
+- Drawings persist on the map item. A new visitor sees every set
+  that's been added so far.
+- A markup set isn't a data layer until you promote it. Download
+  GeoJSON when you just need the sketches offline; promote when you
+  want styling, sharing, OGC access, or derived-layer pipelines on
+  the result.
+- Comments threaded against the map and against individual pins
+  pair nicely with markup. See [Comments](/help/map-editing/comments)
+  for the conversation side.

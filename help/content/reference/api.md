@@ -1,0 +1,295 @@
+---
+id: reference-api
+title: The HTTP API
+seoTitle: "GratisGIS REST API reference"
+summary: The routes the Python client calls, for anyone working in another language.
+category: reference
+order: 48
+complexity: advanced
+tags:
+  - api
+  - integration
+  - rest
+  - ogc
+related:
+  - reference-python-client
+  - reference-api-keys
+  - getting-started-qgis-stac
+---
+
+Everything in the portal goes through one HTTP API, and an API key
+reaches all of it. The [Python client](/help/reference/python-client)
+is the easiest way in; this page is for anyone working in another
+language, or wanting to know what the client is actually doing.
+
+Base URL is your portal plus `/api`. Authenticate with a bearer token:
+
+```bash
+curl -H "Authorization: Bearer ggk_..." \
+  https://your-portal.example/api/users/me
+```
+
+## The routes worth knowing
+
+`:id` is a data layer item's id. `:layer` is the id of a layer inside
+it, which you get from the item's `data.layers[].id` and which is not
+the layer's display name.
+
+### Identity
+
+| | |
+|---|---|
+| `GET /api/portal-info` | Portal name, version, which features are on. No auth needed. |
+| `GET /api/users/me` | Who this key acts as. |
+
+### Items
+
+| | |
+|---|---|
+| `GET /api/items?type=&q=&limit=&full=` | Search. `q` is the search text. Total count comes back in the `X-Total-Count` header. |
+| `GET /api/items/:id` | One item, including its `data` payload. |
+| `POST /api/items` | Create. Body is `{type, title, data, ...}`. |
+| `PATCH /api/items/:id` | Sparse update; only the keys you send change. |
+
+Creating a data layer means posting an item whose `data` is
+`{version: 3, storageType: "postgis", layers: [...]}`. Nothing needs
+provisioning afterwards; the item takes features straight away.
+
+### Features
+
+| | |
+|---|---|
+| `GET /api/items/:id/layers/:layer/features` | GeoJSON FeatureCollection. |
+| `POST /api/items/:id/layers/:layer/features` | Append. `{features: [...]}`, up to 5000 per call. |
+| `PATCH /api/items/:id/layers/:layer/features/:fid` | Update one feature's geometry or properties. |
+| `DELETE /api/items/:id/layers/:layer/features/:fid` | Remove one feature. |
+| `GET /api/items/:id/layers/:layer/features-search?q=&fields=` | Text containment search. |
+| `GET /api/items/:id/layers/:layer/delta?since=N` | Observation-log changes (including deletes) since sync version `N`, for O(changes) field / QGIS sync. When `truncated` is true, call again with `since=nextSince&after=nextAfter` from the response. |
+
+Feature `PATCH` / `DELETE` accept `checkOnly=true` to validate
+optimistic concurrency (`baseObservationId`) and schema without
+writing. A `409` conflict response includes the losing-side edit;
+the portal also keeps a capped `syncConflicts` list on the layer
+for later review in the Layer data panel (see
+[Data layer](/help/items/data-layer) help: **Sync versions and
+conflicts**). Editors can re-apply a losing edit from that list
+(PATCH / DELETE with a live `baseObservationId`, or POST recreate
+when the feature is gone). The field PWA offline drain (and Android
+queue drain) call `checkOnly=true` before each queued update/delete
+so validation failures surface before the real transfer. Android
+rejected conflict rows can re-apply the queued losing side
+(PATCH / DELETE with a live `baseObservationId`, or POST recreate)
+after a confirm.
+
+Read parameters: `limit`, `cursor`, `at`, `bbox`, `parentFk` +
+`parentId`, `timeField` + `timeFrom` + `timeTo`.
+
+**Paging.** Pass `limit` and you get one page plus `nextCursor` and
+`asOf`. Send `nextCursor` back as `cursor`, and `asOf` back as `at` so
+every page reads the same snapshot. Stop when `nextCursor` is null, not
+when a page comes back empty: deleted rows occupy page slots, so an
+empty page can still have data behind it.
+
+Without `limit` you get the entire layer in one response, which on a
+large layer is slow and large.
+
+**Filtering.** There is no `where` and no query language. `parentFk`
+with `parentId` is exact equality on one field; `timeField` with
+`timeFrom`/`timeTo` is an inclusive date range. An unrecognised field
+name in either is **ignored**, and you get the unfiltered layer back, so
+check your spelling against the layer's `fields`.
+
+### Attachments
+
+Files attach to individual features. There is no multipart upload: the
+API never handles the bytes.
+
+| | |
+|---|---|
+| `GET /api/items/:id/layers/:layer/features/:fid/attachments` | List. A bare array, unpaginated. |
+| `POST /api/storage/presign-upload` | `{kind: "feature-attachment", contentType, sizeBytes}` → `{uploadUrl, publicUrl, key, contentType, maxBytes}`. `sizeBytes` is required. |
+| `PUT <uploadUrl>` | The bytes, straight to object storage. |
+| `POST /api/items/:id/layers/:layer/features/:fid/attachments` | Register: `{fileName, mime, sizeBytes, storageKey, storageUrl}`. |
+| `GET /api/storage/private/feature-attachment/:key` | Download. Streams, supports `Range`. |
+| `DELETE /api/items/:id/layers/:layer/features/:fid/attachments/:attId` | 204. |
+
+Three things that catch people out:
+
+- **The presigned `PUT` must not carry your API key.** The URL is signed,
+  and an extra `Authorization` header invalidates the signature. Its
+  `Content-Type` must exactly match what you presigned with. It expires
+  in 180 seconds.
+- **`storageUrl` on a record is a path into the web app**, not the API.
+  To download, take the UUID from the end of it and call
+  `/api/storage/private/feature-attachment/{uuid}`.
+- **The size is part of the signature.** The presign refuses a
+  `sizeBytes` above the cap for that kind, and the `PUT` must send
+  exactly that many bytes (a matching `Content-Length`) or object
+  storage rejects it. `maxBytes` in the response is the cap.
+
+Listing needs read access. Downloading needs **download** permission,
+the same as the exports below, so a collaborator who can only view the
+layer gets 403. Registering and deleting need edit access and a key
+without the read-only option.
+
+### Export
+
+| | |
+|---|---|
+| `GET /api/items/:id/layers/:layer/geoparquet` | GeoParquet. Streams the whole layer. |
+| `GET /api/items/:id/layers/:layer/csv?geometry=none\|wkt\|lonlat\|auto` | CSV. Streams the whole layer. |
+| `GET /api/items/:id/layers/:layer/geojson` | GeoJSON. |
+
+The first two need **download** permission and return 403 without it.
+
+## Standards endpoints
+
+Read-only, standards-compliant, and public where the item is. Each of
+these has a landing document that describes itself, so pointing a
+conforming client at the root is usually enough.
+
+### OGC API Features
+
+```
+GET /api/public/ogc
+GET /api/public/ogc/conformance
+GET /api/public/ogc/collections
+GET /api/public/ogc/collections/{id}/items?bbox=&limit=&offset=
+```
+
+Core, GeoJSON, and CRS conformance classes. CQL2 filtering is not
+on the roadmap for v1 (parked for a later major). `sortby` is
+intentionally rejected with HTTP 400 until a real `ORDER BY` path
+exists; items stay in stable feature-id order for paging. Do not
+treat either as "coming soon." Anonymous OGC landing, conformance,
+and OpenAPI docs (`GET /api/public/ogc`, `/conformance`, `/api`)
+are rate-limited at **60 requests per minute** per IP.
+
+### OGC API Tiles
+
+Vector tiles for each collection, as a WebMercatorQuad tileset.
+Conformance covers core, tileset, tilesets-list, geodata-tilesets and
+mvt.
+
+### OGC API Styles
+
+A MapLibre style document per collection, served as
+`application/vnd.mapbox.style+json`. Anonymous styles list and
+per-style / metadata GETs are rate-limited at **60 requests per
+minute** per IP.
+
+### OGC API Records
+
+Catalogue records for discovery. Anonymous list and single-record
+GETs are rate-limited at **60 requests per minute** per IP. QGIS
+MetaSearch and similar clients should prefer the searchable-catalog
+collection:
+
+```
+GET /api/public/ogc/collections/catalog
+GET /api/public/ogc/collections/catalog/items
+GET /api/public/ogc/records
+```
+
+`/records` stays as an alias. The searchable-catalog collection
+document at `GET /api/public/ogc/collections/catalog` is also
+rate-limited at **60 requests per minute** per IP. Data-layer
+records include a `FILE:GEO` GeoJSON enclosure so MetaSearch Add
+Data can load features. Curated DCAT / Aardvark themes live on
+items as `dcat_theme_sm` (separate from free-form keywords);
+harvest tools can also fetch
+`GET /api/public/ogc/aardvark/{id}.json` (rate-limited at
+**60 requests per minute** per IP).
+
+### Citation export
+
+Public items also expose bibliography downloads (no DOI minting;
+the portal URL and item id are the identifiers):
+
+```
+GET /api/public/ogc/citation/{id}.bib
+GET /api/public/ogc/citation/{id}.ris
+GET /api/public/ogc/citation/{id}.jsonld
+```
+
+The Metadata tab on a public item offers the same formats from a
+Cite menu.
+
+### STAC
+
+A full STAC API root at `/api/public/stac`, with collections and both
+GET and POST item search. This is the endpoint newer QGIS releases use
+to browse rasters without a plugin. Step-by-step setup is in
+**Browse public rasters from QGIS with STAC**. Anonymous STAC root,
+conformance, and OpenAPI docs (`GET /api/public/stac`,
+`/conformance`, `/api`), plus collections landing
+(`GET /collections` and `GET /collections/:id`), items, and search
+are rate-limited at **60 requests per minute** per IP.
+
+### CSW 2.0.2
+
+A Catalog Service for the Web endpoint at `/api/public/csw`, for
+clients that expect the older OGC catalogue protocol. Anonymous
+GetCapabilities / GetRecords calls are rate-limited at **60 requests
+per minute** per IP.
+
+### Portal landing and public items
+
+The anonymous org landing payload at `GET /api/public/landing`
+(optional `?org=` slug), single public item GETs at
+`GET /api/public/items/:id`, the public basemap gallery at
+`GET /api/public/items?type=basemap`, the vendored OSM presets
+catalog at `GET /api/public/osm/presets`, and per-item thumbnail
+SVGs at `GET /api/portal/items/:id/thumbnail.svg` are rate-limited
+at **60 requests per minute** per IP.
+
+### Print render tokens
+
+The Chromium print sidecar consumes single-use render tokens at
+`POST /api/print/consume-render-token` and
+`POST /api/print/internal/load-job` (both `@Public`, authorized by
+token rather than Keycloak). Those routes are rate-limited at
+**60 requests per minute** per IP in addition to single-use token
+semantics.
+
+### DCAT catalog.json
+
+A Project Open Data–shaped JSON catalog of every public item at
+`GET /api/public/catalog.json` (optional `?org=` slug). Anonymous
+calls are rate-limited at **60 requests per minute** per IP.
+
+Authenticated equivalents of Features and STAC live at `/api/ogc` and
+`/api/stac` and apply the caller's own sharing rules, so an API key
+sees exactly what its owner sees.
+
+## Errors
+
+Standard status codes, with a JSON body carrying a `message` written
+for a person.
+
+| | |
+|---|---|
+| `400` / `422` | The request was malformed or failed validation |
+| `401` / `403` | Key missing, revoked, or lacking permission |
+| `404` | No such item, layer, or feature |
+| `409` | Conflict |
+| `429` | Rate limited; see the `Retry-After` header |
+
+An API key is refused outright on admin endpoints, and a read-only key
+is refused on any write, whatever the sharing says.
+
+## The full specification
+
+The portal generates an OpenAPI document from the code itself. It is
+served at `/docs` and is enabled by default outside production; on a
+production portal an administrator turns it on with `ENABLE_SWAGGER=1`.
+It is off by default because it publishes the entire surface, including
+routes that are not meant to be interesting to the public.
+
+Running locally, `http://localhost:4000/docs` gives you the browsable
+version of everything above and a good deal more.
+
+## See also
+
+- [Python client](/help/reference/python-client): a wrapper around all of this
+- [API keys](/help/reference/api-keys): authentication
