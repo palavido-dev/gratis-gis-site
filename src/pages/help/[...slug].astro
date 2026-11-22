@@ -1,0 +1,195 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The GratisGIS help, one static page per doc in help/content (copied
+// from the main repository by scripts/sync-help.mjs). The same files
+// are the in-portal help, so the URLs match: /help/<slug>/ here and
+// /help/<slug> in a portal. Portals name these pages as canonical.
+import Base from '../../layouts/Base.astro';
+import HelpNav from '../../components/HelpNav.astro';
+import {
+  buildNav,
+  categoryLabel,
+  findDoc,
+  helpDocs,
+  helpPath,
+  type HelpDoc,
+} from '../../lib/help/content';
+import { DEMO_URL, SITE_URL } from '../../lib/site';
+
+export function getStaticPaths() {
+  return helpDocs.map((doc) => ({
+    params: { slug: doc.slug || undefined },
+    props: { doc },
+  }));
+}
+
+interface Props {
+  doc: HelpDoc;
+}
+
+const { doc } = Astro.props;
+const fm = doc.frontmatter;
+const isLanding = doc.slug === '';
+const nav = buildNav();
+const path = helpPath(doc.slug);
+
+const pageTitle = isLanding
+  ? 'GratisGIS help: documentation for the open source GIS portal'
+  : `${fm.seoTitle ?? fm.title} | GratisGIS Help`;
+
+// Breadcrumbs: Help, then each category, then the page. Categories
+// have no page of their own, so they link to the help home.
+const categoryParts = (fm.category ?? '').split('/').filter(Boolean);
+const crumbs = isLanding
+  ? [{ name: 'Help', path: '/help/' }]
+  : [
+      { name: 'Help', path: '/help/' },
+      { name: fm.title, path },
+    ];
+
+const related = (fm.related ?? [])
+  .map((r) => {
+    const ref = typeof r === 'string' ? r : r.id;
+    const match = findDoc(ref);
+    if (!match) return null;
+    const label = typeof r === 'object' && r.label ? r.label : match.frontmatter.title;
+    return { label, path: helpPath(match.slug), summary: match.frontmatter.summary };
+  })
+  .filter((r): r is { label: string; path: string; summary: string } => r !== null);
+
+const prerequisites = (fm.prerequisites ?? [])
+  .map((ref) => findDoc(ref))
+  .filter((d): d is HelpDoc => d !== undefined);
+
+// The landing page lists every top-level category and its pages.
+const sections = isLanding
+  ? nav.children.map((node) => ({
+      label: node.label,
+      docs: helpDocs.filter(
+        (d) => d.slug !== '' && categoryLabel((d.frontmatter.category ?? '').split('/')[0] ?? '') === node.label,
+      ),
+    }))
+  : [];
+
+const jsonLd = isLanding
+  ? []
+  : [
+      {
+        '@type': 'TechArticle',
+        headline: fm.seoTitle ?? fm.title,
+        description: fm.summary,
+        url: new URL(path, SITE_URL).href,
+        inLanguage: 'en',
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        ...(fm.tags && fm.tags.length > 0 ? { keywords: fm.tags.join(', ') } : {}),
+      },
+    ];
+---
+
+<Base title={pageTitle} description={fm.summary} path={path} breadcrumbs={crumbs} jsonLd={jsonLd}>
+  <div class="wrap docs">
+    <aside class="docs-aside" id="help-topics" aria-label="Help topics">
+      <p class="docs-aside-title">Help topics</p>
+      <HelpNav nav={nav} activeSlug={doc.slug} />
+    </aside>
+
+    <article class="docs-article">
+      <a class="docs-jump" href="#help-topics">All help topics</a>
+      <nav class="docs-crumbs" aria-label="Breadcrumb">
+        <a href="/help/">Help</a>
+        {
+          categoryParts.map((part) => (
+            <>
+              <span aria-hidden="true">/</span>
+              <span>{categoryLabel(part)}</span>
+            </>
+          ))
+        }
+      </nav>
+
+      <h1>{isLanding ? 'GratisGIS help' : fm.title}</h1>
+      <p class="lead">{fm.summary}</p>
+      {
+        fm.complexity && !isLanding && (
+          <p class={`docs-level docs-level-${fm.complexity}`}>{fm.complexity}</p>
+        )
+      }
+
+      {
+        prerequisites.length > 0 && (
+          <div class="docs-callout">
+            <strong>Read first:</strong>{' '}
+            {prerequisites.map((p, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={helpPath(p.slug)}>{p.frontmatter.title}</a>
+              </>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        isLanding ? (
+          <div class="docs-body">
+            <p>
+              GratisGIS is an open source GIS portal you run on your own server. These pages cover
+              it one concept per page: what a feature does, how to set it up, and what it does not
+              do yet. The same help ships inside every GratisGIS portal.
+            </p>
+            <p>
+              New here? Start with{' '}
+              <a href="/help/getting-started/what-is-gratisgis/">What is GratisGIS</a> and{' '}
+              <a href="/help/getting-started/creating-your-first-map/">Creating your first map</a>.
+              Moving from ArcGIS Online? Start with{' '}
+              <a href="/help/coming-from-arcgis/">Coming from ArcGIS Online</a>.
+            </p>
+          </div>
+        ) : (
+          <div class="docs-body" set:html={doc.html} />
+        )
+      }
+
+      {
+        isLanding && (
+          <div class="docs-sections">
+            {sections.map((s) => (
+              <section>
+                <h2>{s.label}</h2>
+                <ul>
+                  {s.docs.map((d) => (
+                    <li>
+                      <a href={helpPath(d.slug)}>{d.frontmatter.title}</a>
+                      <span>{d.frontmatter.summary}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        related.length > 0 && (
+          <section class="docs-related">
+            <h2>Related</h2>
+            <ul>
+              {related.map((r) => (
+                <li>
+                  <a href={r.path}>{r.label}</a>
+                  <span>{r.summary}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <p class="docs-foot">
+        This help ships with every GratisGIS portal under <strong>Help</strong>. Try it on the{' '}
+        <a href={DEMO_URL}>live demo</a> or <a href="/install/">install your own</a>.
+      </p>
+    </article>
+  </div>
+</Base>

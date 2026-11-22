@@ -1,0 +1,149 @@
+---
+id: items-data-layer
+title: Data layer
+seoTitle: "Data layers: PostGIS feature layers with OGC API access"
+summary: "An item holding one or more PostGIS feature tables, served through OGC API Features and a public API. Fills the role of a hosted feature layer."
+category: items/data
+order: 20
+complexity: basic
+tags:
+  - data-layer
+  - item-type
+  - features
+related:
+  - items-map
+  - items-data-collection
+  - reference-api
+  - bundle-export
+---
+
+A **data layer** is the native item type for feature data. It owns
+one or more PostGIS tables and the schema that describes them.
+Maps reference data layers; data layers reference nothing.
+
+![Data layer detail page with Overview map preview and feature stats](/help/items/data-layer-detail.png)
+
+## What's in a data layer
+
+- **One or more sublayers**, each backed by its own PostGIS table.
+ Sublayers are what get rendered on a map.
+- **A schema per sublayer**. Field list with types, domains (coded
+ values, ranges), and required flags.
+- **Optional related sublayers**. Non-spatial tables whose rows
+ reference a parent feature. Used for one-to-many attribute data,
+ inspection histories, photo metadata, etc.
+- **Optional attachments**. Files (typically photos) bound to a
+ specific feature. Stored in MinIO, the metadata row in the
+ `feature_attachment` table.
+
+## Importing data
+
+Three ways to get features into a data layer:
+
+- **Upload at create**. The new-item wizard offers a file upload
+ step (Shapefile zip, GeoJSON, GeoPackage, KML, KMZ, File
+ Geodatabase `.gdb.zip`). The file is staged once. Each probed
+ layer becomes a sublayer, and creating the item starts a background
+ import of the features. A GeoJSON file added only as a map layer
+ is not a data layer and does not appear in dashboard lists.
+- **Import on an existing data layer**. On the Structure tab, Import
+ from file adds the layers to the schema. Save schema to load the
+ features. On the Data tab, each sublayer also has Import features.
+ File Geodatabase uploads stage on the server; if the archive has
+ more than one layer you pick which source layer to load, then a
+ background import job runs.
+- **Submitted via a form**. A form item paired to this data layer
+ posts new rows when respondents submit.
+
+## Editing features
+
+Two surfaces:
+
+- **The feature browser** (a section on the detail page) lets you
+ view, add, edit, and delete rows attribute-only.
+- **A map** that references this layer lets you edit geometry
+ graphically. The data layer's own detail page can't do
+ geometry editing. There's no map canvas there.
+
+## Exporting
+
+The **Export** dropdown on the feature browser produces CSV, XLSX,
+or a full Bundle (XLSX + related tables + attachments) as a ZIP.
+See **Bundle export**.
+
+## Versions
+
+Data layers are versioned bitemporally: every edit becomes an
+observation in the engine's log. This means:
+
+- **Undo works at every level**. Single-row, batch, layer-wide.
+- **Time-travel queries**. Show me this layer as of last Tuesday.
+- **Audit trail**. Every observation records who changed what
+  and when.
+
+The bitemporal engine is mostly invisible day-to-day. Where you
+see it: the **As of** time slider in the map editor and the
+**History** column when you right-click a feature in the
+attribute table.
+
+## Sync versions and conflicts
+
+Each sublayer also carries a monotonic **sync version** that bumps
+when a feature write batch is accepted. Field apps and the QGIS
+plugin can ask for only the changes since a version they already
+have (`delta?since=N` on the HTTP API), instead of re-downloading
+the whole layer. The field PWA offline refresh (on a **Data
+collection** deployment) uses that delta when it already has a
+cursor, so a second download only pulls what changed.
+
+When two editors change the same feature and one save loses the
+optimistic concurrency check, the losing edit is kept on the layer
+as a **sync conflict**. Open the **Layer data** panel on the item
+page to review recent conflicts after a sync, so a field crew can
+see what did not land and decide what to retry.
+
+Field offline push dry-runs each queued **update** and **delete**
+with `checkOnly=true` before the real write. A conflict or schema
+refusal parks that edit on the device with the server reason and
+does not transfer it; the conflict artifact is still recorded for
+review. New features (creates) upload without a dry-run.
+
+If you can edit the layer, each conflict offers **Re-apply** and
+**Dismiss**. Confirm for Re-apply shows the losing side next to what
+was current at conflict time. Re-apply writes the losing update onto
+the live feature (with the current observation id), deletes when the
+losing side was a delete, or recreates the feature when it is gone.
+After a successful re-apply you can clear the card; **Dismiss** alone
+removes the list entry without changing live features.
+
+On the Android field app, rejected queue rows that parked a server
+`current` offer the same **Re-apply** (and Recreate when the feature
+is gone) next to Discard, with a confirm that compares queued vs
+server-now before writing.
+
+Field collectors usually first see parked edits on a
+[Data collection](/help/items/data-collection) deployment (queue badge /
+rejected list). Resolve the durable conflict cards here on the
+**Layer data** panel of the paired data layer. This is optimistic
+concurrency review, not multi-user CRDT merge on drawings.
+
+## What this is not
+
+- **Not a hosted feature service drop-in.** Clients that speak
+  ArcGIS REST FeatureServer / FeatureLayer URLs do not point at a
+  data layer and keep working unchanged.
+- **Not ArcGIS Server.** Editing, sync, and export use the portal
+  HTTP API, OGC Features, and related public mirrors — not an
+  ArcGIS Server site or enterprise geodatabase replica.
+- **Not a promise of FeatureServer parity.** Schema, domains, and
+  attachments map well for many layers; service-level behavior
+  (versioned views, replica sync, relationship classes as AGO
+  ships them) does not.
+
+## Related
+
+- [Data collection](/help/items/data-collection) for offline queue,
+  dry-run push, and where collectors open the field PWA.
+- [HTTP API](/help/reference/api) for `checkOnly=true`, `delta?since=N`,
+  and the `syncConflicts` shape.
+- [Map](/help/items/map) for how maps reference this item.

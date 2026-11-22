@@ -11,14 +11,16 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "sync:releases": "node scripts/sync-releases.mjs"
+    "sync:releases": "node scripts/sync-releases.mjs",
+    "sync:help": "node scripts/sync-help.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",
     "@fontsource/ibm-plex-mono": "5.3.0",
     "@fontsource/inter": "5.3.0",
     "@fontsource/newsreader": "5.3.0",
-    "astro": "7.4.7"
+    "astro": "7.4.7",
+    "js-yaml": "5.5.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",

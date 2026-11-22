@@ -4,9 +4,10 @@ name: Site
 #
 # Pull requests build the site and stop. A push to main
 # builds it and, once Pages is turned on, deploys it to GitHub Pages.
-# The build reads release facts from the GitHub releases API, so a
-# scheduled run every 6 hours (and a manual run) rebuilds and redeploys
-# the site to pick up new releases without a commit here.
+# The build reads release facts from the GitHub releases API and the
+# help from the main repository, so a scheduled run every 6 hours (and
+# a manual run) rebuilds and redeploys the site to pick up new releases
+# and help changes without a commit here.
 #
 # First run: the deploy job is skipped until the repository variable
 # SITE_DEPLOY is set to "true" (Settings > Secrets and variables >
@@ -54,6 +55,17 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Refresh the help from the main repository
+        # gratisgis.org/help is built from the main repository's
+        # apps/portal-web/content/help. Pushes and the scheduled run
+        # pull the current copy, so a help change there shows up here
+        # within 6 hours. Pull requests build the committed copy in
+        # help/, so a PR shows exactly what it changes. If the fetch
+        # fails, the build carries on with the committed copy.
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: pnpm sync:help
 
       - name: Type check
         run: pnpm check
