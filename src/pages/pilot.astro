@@ -1,0 +1,94 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The hosted pilot call for applications. Public pitches go to the
+// "Hosted pilot" category in GitHub Discussions, which has a form
+// (.github/DISCUSSION_TEMPLATE/hosted-pilot.yml in the main repo);
+// private ones go by email with the same questions.
+import Base from '../layouts/Base.astro';
+import { DEMO_URL, REPO_URL } from '../lib/site';
+
+const PILOT_EMAIL = 'matthew@gratisgis.org';
+const DEADLINE = 'January 31, 2027';
+const PUBLIC_URL = `${REPO_URL}/discussions/new?category=hosted-pilot`;
+const QUESTIONS = [
+  'Organization name and type (agency, school, nonprofit, company)',
+  'How many people would use it',
+  'What you use today (ArcGIS Online, ArcGIS Enterprise, QGIS only, paper, something else)',
+  'One or two real workflows you would run on it',
+  'Who would be the day-to-day contact',
+  'Would you be open to a public case study at the end',
+];
+const mailBody = `${QUESTIONS.map((q, i) => `${i + 1}. ${q}:\n`).join('\n')}`;
+const mailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent('GratisGIS hosted pilot')}&body=${encodeURIComponent(mailBody)}`;
+---
+
+<Base
+  title="Hosted pilot: 12 months of GratisGIS, run for you | GratisGIS"
+  description="One organization gets GratisGIS hosted and looked after for 12 months at no cost, in return for real use and honest feedback. Applications close January 31, 2027."
+  path="/pilot/"
+  breadcrumbs={[{ name: 'Hosted pilot', path: '/pilot/' }]}
+>
+  <article class="wrap prose">
+    <p class="eyebrow">Hosted pilot</p>
+    <h1>12 months of GratisGIS, run for you</h1>
+    <p>
+      I'm looking for one organization to use GratisGIS for real work. I host it, keep it updated and
+      back it up for 12 months, at no cost. You use it, tell me what works and what doesn't, and help
+      shape what gets built next.
+    </p>
+    <p><strong>Applications close {DEADLINE}.</strong></p>
+
+    <h2>What you get</h2>
+    <ul>
+      <li>Your own GratisGIS portal at its own address, set up and maintained for you.</li>
+      <li>Help moving your first maps and layers in, including from ArcGIS Online.</li>
+      <li>A direct line to the person building it, and your requests near the front of the queue.</li>
+      <li>
+        Your data stays yours. You can export it at any time in standard formats, and at the end you
+        can move to your own server with help.
+      </li>
+    </ul>
+
+    <h2>What I ask in return</h2>
+    <ul>
+      <li>Use it on at least one real workflow, not just a look around.</li>
+      <li>A short check-in call once a month.</li>
+      <li>Honest feedback, including what's broken or confusing.</li>
+      <li>If it goes well, permission to write it up as a case study.</li>
+    </ul>
+
+    <h2>Who is a good fit</h2>
+    <p>
+      Agencies, schools, nonprofits and companies all count. Size matters less than commitment: a team
+      of 5 to 50 with a named contact and a real job to do is a better fit than a big name that is only
+      exploring. Field data collection, public maps and replacing per-user licenses are all good
+      starting points.
+    </p>
+
+    <h2>How to apply</h2>
+    <p>Answer these questions, either way you prefer:</p>
+    <ol>
+      {QUESTIONS.map((q) => <li>{q}</li>)}
+    </ol>
+    <ul>
+      <li>
+        <strong>In public:</strong>{" "}
+        <a href={PUBLIC_URL}>post in the Hosted pilot discussion on GitHub</a>. The form asks the same
+        questions.
+      </li>
+      <li>
+        <strong>Privately:</strong> <a href={mailto}>email {PILOT_EMAIL}</a>. Nothing you send is
+        shared.
+      </li>
+    </ul>
+    <p>
+      Before applying, you can try the <a href={DEMO_URL}>public demo</a> to see whether it fits.
+    </p>
+
+    <h2>How the pick is made</h2>
+    <p>
+      I read every application and pick one after {DEADLINE}, based on fit and on who is ready to use it
+      for real. Nothing is promised to anyone for applying. Everyone who applies hears back either way.
+    </p>
+  </article>
+</Base>
