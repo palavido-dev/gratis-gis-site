@@ -10,10 +10,10 @@ import { DEMO_URL, REPO_URL } from '../lib/site';
 
 const PILOT_EMAIL = 'pilot@gratisgis.org';
 const FORM_URL = 'https://forms.gratisgis.org/';
-// Set at build time from the TURNSTILE_SITE_KEY repository variable.
-// Without it the page offers email and GitHub only, so nothing broken
-// shows before the form handler is deployed.
-const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
+// The Turnstile widget's site key. It is public by design (it ships in
+// the page); the secret half lives only in the Worker. Set it to '' to
+// fall back to email and GitHub only.
+const SITE_KEY = '0x4AAAAAAGWjLxlSRhZxp3xh';
 const ORG_TYPES = ['Agency', 'School', 'Nonprofit', 'Company', 'Other'];
 const TODAY = ['ArcGIS Online', 'ArcGIS Enterprise', 'QGIS only', 'Paper or spreadsheets', 'Something else'];
 const DEADLINE = 'January 31, 2027';

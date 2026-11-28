@@ -9,28 +9,22 @@ emails it through Cloudflare Email Routing. Nothing is stored.
   Reply-To, so replying answers them.
 - Without JavaScript the form still posts and the page shows the result.
 
-## One-time setup
+## Setup (done 2026-11-28)
 
-1. **Email Routing** (Cloudflare dashboard, gratisgis.org, Email,
-   Email Routing):
-   - Add a routing rule `pilot@gratisgis.org` forwarding to your inbox,
-     so people can also write to that address directly.
-   - The inbox the form sends to must be listed under Destination
-     addresses as verified.
-2. **Turnstile** (dashboard, Turnstile, Add widget): hostname
-   `gratisgis.org`, mode Managed. Note the site key and the secret key.
-3. **API token** (My Profile, API Tokens, Create token, "Edit Cloudflare
-   Workers" template), limited to this account and the gratisgis.org
-   zone. Note your account ID from the dashboard sidebar.
-4. **GitHub, gratis-gis-site repository** (Settings, Secrets and
-   variables, Actions):
-   - Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
-     `TURNSTILE_SECRET`, `PILOT_TO_ADDRESS` (the verified inbox).
-   - Variables: `TURNSTILE_SITE_KEY` (the site key) and
-     `PILOT_FORM_DEPLOY` = `true`.
-5. Run the **Pilot form** workflow once (Actions, Pilot form, Run
-   workflow), then the **Site** workflow so the page picks up the site
-   key. The form appears on the page once both have run.
+- Email Routing rule `pilot@gratisgis.org` forwards to the verified inbox.
+- Turnstile widget "GratisGIS pilot form" for `gratisgis.org`. Its site
+  key is in `src/pages/pilot.astro`; its secret is a Worker secret.
+- Worker `gratisgis-pilot-form` on the custom domain
+  `forms.gratisgis.org`, with secrets `TURNSTILE_SECRET` and `TO_ADDRESS`.
+
+## Redeploying
+
+From this folder, signed in to the Cloudflare account that holds
+gratisgis.org: `npx wrangler deploy`. Secrets carry over between deploys.
+The Pilot form workflow does the same from GitHub once the repository
+has `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `TURNSTILE_SECRET`
+and `PILOT_TO_ADDRESS` secrets and the `PILOT_FORM_DEPLOY` variable set
+to `true`; until then it is skipped.
 
 ## Tests
 
