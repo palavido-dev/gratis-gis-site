@@ -7,6 +7,7 @@
 // workers/pilot-form and arrives by email, or straight by email.
 import Base from '../layouts/Base.astro';
 import { DEMO_URL, REPO_URL } from '../lib/site';
+import { PILOT_DEADLINE_TEXT, pilotOpen } from '../lib/pilot';
 
 const PILOT_EMAIL = 'pilot@gratisgis.org';
 const FORM_URL = 'https://forms.gratisgis.org/';
@@ -18,7 +19,8 @@ const ORG_TYPES = ['Agency', 'School', 'Nonprofit', 'Company', 'Other'];
 // Keep in step with USER_RANGES in workers/pilot-form/src/application.js.
 const USER_RANGES = ['1 to 5', '6 to 15', '16 to 50', '51 to 200', 'More than 200'];
 const TODAY = ['ArcGIS Online', 'ArcGIS Enterprise', 'QGIS only', 'Paper or spreadsheets', 'Something else'];
-const DEADLINE = 'January 31, 2027';
+const DEADLINE = PILOT_DEADLINE_TEXT;
+const OPEN = pilotOpen();
 const PUBLIC_URL = `${REPO_URL}/discussions/new?category=hosted-pilot`;
 const QUESTIONS = [
   'Organization name and type (agency, school, nonprofit, company)',
@@ -46,7 +48,7 @@ const mailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent('GratisGIS ho
       back it up for 12 months, at no cost. You use it, tell me what works and what doesn't, and help
       shape what gets built next.
     </p>
-    <p><strong>Applications close {DEADLINE}.</strong></p>
+    <p><strong>{OPEN ? `Applications close ${DEADLINE}.` : `Applications closed ${DEADLINE}. Thanks to everyone who applied.`}</strong></p>
 
     <h2>What you get</h2>
     <ul>
@@ -75,8 +77,8 @@ const mailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent('GratisGIS ho
       starting points.
     </p>
 
-    <h2>How to apply</h2>
-    {SITE_KEY ? (
+    {OPEN && <h2>How to apply</h2>}
+    {!OPEN ? null : SITE_KEY ? (
       <>
         <p>
           Fill this in and it comes straight to me. Nothing you send is published. Prefer to post in

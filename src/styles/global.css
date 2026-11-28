@@ -1231,3 +1231,11 @@ main:focus {
 .pilot-form .check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
 .pilot-form .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 #pilot-status { min-height: 1.5em; color: var(--accent-hover); font-weight: 500; }
+
+/* Home page notice for the hosted pilot (shown until the deadline). */
+.hero-notice { margin-top: 20px; }
+.hero-notice a {
+  display: inline-block; padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 12px;
+  background: var(--surface); color: var(--ink); text-decoration: none; font-size: 0.95rem;
+}
+.hero-notice a:hover { border-color: var(--accent); color: var(--accent-hover); }

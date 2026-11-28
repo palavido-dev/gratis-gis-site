@@ -26,6 +26,7 @@ import {
   repoFile,
 } from '../lib/site';
 import { getReleaseData } from '../lib/releases';
+import { pilotOpen } from '../lib/pilot';
 
 const releases = await getReleaseData();
 
@@ -189,6 +190,14 @@ const jsonLd = [
         <a class="btn btn-primary btn-lg" href={DEMO_URL}>Open the demo</a>
         <a class="btn btn-link btn-lg" href="/install/">Read the install guide</a>
       </div>
+      {pilotOpen() && (
+        <p class="hero-notice">
+          <a href="/pilot/">
+            <strong>Hosted pilot:</strong> one organization gets GratisGIS hosted free for 12 months.
+            Apply by January 31 <span aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      )}
     </div>
   </section>
 
