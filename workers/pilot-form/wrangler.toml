@@ -1,0 +1,23 @@
+# The hosted pilot form handler. Deployed by
+# .github/workflows/pilot-form.yml; setup steps are in README.md.
+name = "gratisgis-pilot-form"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# forms.gratisgis.org; wrangler creates the DNS record on first deploy.
+routes = [{ pattern = "forms.gratisgis.org", custom_domain = true }]
+
+# Sends through Email Routing. Cloudflare only delivers to verified
+# destination addresses, so TO_ADDRESS (a secret, kept out of this
+# public file) must be one of those.
+[[send_email]]
+name = "PILOT_EMAIL"
+
+[vars]
+ALLOWED_ORIGIN = "https://gratisgis.org"
+RETURN_URL = "https://gratisgis.org/pilot/"
+FROM_ADDRESS = "pilot@gratisgis.org"
+# Secrets, set with `wrangler secret put` (or the deploy workflow):
+#   TURNSTILE_SECRET  the Turnstile widget's secret key
+#   TO_ADDRESS        the verified inbox applications go to
