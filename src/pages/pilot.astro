@@ -2,12 +2,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // The hosted pilot call for applications. Public pitches go to the
 // "Hosted pilot" category in GitHub Discussions, which has a form
-// (.github/DISCUSSION_TEMPLATE/hosted-pilot.yml in the main repo);
-// private ones go by email with the same questions.
+// (.github/DISCUSSION_TEMPLATE/hosted-pilot.yml in the main repo).
+// Private ones go through the form below, which posts to the Worker in
+// workers/pilot-form and arrives by email, or straight by email.
 import Base from '../layouts/Base.astro';
 import { DEMO_URL, REPO_URL } from '../lib/site';
 
-const PILOT_EMAIL = 'matthew@gratisgis.org';
+const PILOT_EMAIL = 'pilot@gratisgis.org';
+const FORM_URL = 'https://forms.gratisgis.org/';
+// Set at build time from the TURNSTILE_SITE_KEY repository variable.
+// Without it the page offers email and GitHub only, so nothing broken
+// shows before the form handler is deployed.
+const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
+const ORG_TYPES = ['Agency', 'School', 'Nonprofit', 'Company', 'Other'];
+const TODAY = ['ArcGIS Online', 'ArcGIS Enterprise', 'QGIS only', 'Paper or spreadsheets', 'Something else'];
 const DEADLINE = 'January 31, 2027';
 const PUBLIC_URL = `${REPO_URL}/discussions/new?category=hosted-pilot`;
 const QUESTIONS = [
@@ -66,21 +74,65 @@ const mailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent('GratisGIS ho
     </p>
 
     <h2>How to apply</h2>
-    <p>Answer these questions, either way you prefer:</p>
-    <ol>
-      {QUESTIONS.map((q) => <li>{q}</li>)}
-    </ol>
-    <ul>
-      <li>
-        <strong>In public:</strong>{" "}
-        <a href={PUBLIC_URL}>post in the Hosted pilot discussion on GitHub</a>. The form asks the same
-        questions.
-      </li>
-      <li>
-        <strong>Privately:</strong> <a href={mailto}>email {PILOT_EMAIL}</a>. Nothing you send is
-        shared.
-      </li>
-    </ul>
+    {SITE_KEY ? (
+      <>
+        <p>
+          Fill this in and it comes straight to me. Nothing you send is published. Prefer to post in
+          public? <a href={PUBLIC_URL}>Use the Hosted pilot discussion on GitHub</a> instead.
+        </p>
+        <form id="pilot-form" class="pilot-form" method="post" action={FORM_URL}>
+          <label>Organization<input name="organization" required maxlength="200" autocomplete="organization" /></label>
+          <label>Type
+            <select name="orgType" required>
+              <option value="">Pick one</option>
+              {ORG_TYPES.map((t) => <option>{t}</option>)}
+            </select>
+          </label>
+          <label>How many people would use it<input name="users" required maxlength="100" /></label>
+          <fieldset>
+            <legend>What you use today</legend>
+            {TODAY.map((t) => <label class="check"><input type="checkbox" name="today" value={t} /> {t}</label>)}
+          </fieldset>
+          <label>One or two real workflows you would run on it
+            <textarea name="workflows" required maxlength="4000" rows="5" placeholder="For example field inspections with photos, a public map of projects, or replacing a Survey123 form."></textarea>
+          </label>
+          <label>Day-to-day contact (name and role)<input name="contactName" required maxlength="200" autocomplete="name" /></label>
+          <label>Contact email<input type="email" name="email" required maxlength="254" autocomplete="email" /></label>
+          <label>Open to a public case study at the end?
+            <select name="caseStudy" required>
+              <option value="">Pick one</option>
+              <option>Yes</option><option>Maybe</option><option>No</option>
+            </select>
+          </label>
+          <label>Anything else (optional)<textarea name="notes" maxlength="4000" rows="3"></textarea></label>
+          <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+          <div class="cf-turnstile" data-sitekey={SITE_KEY}></div>
+          <p><button type="submit" class="btn btn-primary">Send application</button></p>
+          <p id="pilot-status" role="status" aria-live="polite"></p>
+        </form>
+        <p>
+          Or email the same answers to <a href={mailto}>{PILOT_EMAIL}</a>.
+        </p>
+      </>
+    ) : (
+      <>
+        <p>Answer these questions, either way you prefer:</p>
+        <ol>
+          {QUESTIONS.map((q) => <li>{q}</li>)}
+        </ol>
+        <ul>
+          <li>
+            <strong>In public:</strong>{" "}
+            <a href={PUBLIC_URL}>post in the Hosted pilot discussion on GitHub</a>. The form asks the
+            same questions.
+          </li>
+          <li>
+            <strong>Privately:</strong> <a href={mailto}>email {PILOT_EMAIL}</a>. Nothing you send is
+            shared.
+          </li>
+        </ul>
+      </>
+    )}
     <p>
       Before applying, you can try the <a href={DEMO_URL}>public demo</a> to see whether it fits.
     </p>
@@ -91,4 +143,44 @@ const mailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent('GratisGIS ho
       for real. Nothing is promised to anyone for applying. Everyone who applies hears back either way.
     </p>
   </article>
+  {SITE_KEY && (
+    <script slot="head" is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  )}
+  <script>
+    // Post with fetch so the page can say how it went without leaving.
+    // Without JavaScript the form posts normally and the handler
+    // redirects back here with ?sent=1 or ?error=.
+    const form = document.getElementById('pilot-form') as HTMLFormElement | null;
+    const status = document.getElementById('pilot-status');
+    const say = (text: string) => { if (status) status.textContent = text; };
+    const reasons: Record<string, string> = {
+      check: 'The spam check did not pass. Please try again.',
+      invalid: 'Some answers need another look. Check the required fields.',
+      send: 'Something went wrong sending it. Please try again, or email pilot@gratisgis.org.',
+    };
+    const params = new URLSearchParams(location.search);
+    if (params.get('sent') === '1') say('Thanks, your application is in. You will hear back after January 31.');
+    else if (params.get('error')) say(reasons[params.get('error') ?? ''] ?? reasons.send!);
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = form.querySelector('button');
+      if (button) button.disabled = true;
+      say('Sending...');
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body.ok) {
+          form.reset();
+          say('Thanks, your application is in. You will hear back after January 31.');
+        } else {
+          say(reasons[body.error] ?? reasons.send!);
+          (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+        }
+      } catch {
+        say(reasons.send!);
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  </script>
 </Base>

@@ -1,0 +1,52 @@
+name: Pilot form
+
+# Deploys the hosted pilot form handler (workers/pilot-form) to
+# Cloudflare when it changes on main, or on a manual run. Needs the
+# repository secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
+# TURNSTILE_SECRET and PILOT_TO_ADDRESS; see workers/pilot-form/README.md.
+
+on:
+  push:
+    branches: [main]
+    paths: ['workers/pilot-form/**', '.github/workflows/pilot-form.yml']
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  deploy:
+    name: Deploy the pilot form handler
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: vars.PILOT_FORM_DEPLOY == 'true'
+    permissions:
+      contents: read
+    concurrency:
+      group: pilot-form-deploy
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: workers/pilot-form
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Test
+        run: node --test test/*.test.js
+
+      - name: Deploy
+        run: npx --yes wrangler@4.169.0 deploy
+
+      - name: Set secrets
+        run: |
+          printf '%s' "$TURNSTILE_SECRET" | npx --yes wrangler@4.169.0 secret put TURNSTILE_SECRET
+          printf '%s' "$PILOT_TO_ADDRESS" | npx --yes wrangler@4.169.0 secret put TO_ADDRESS
+        env:
+          TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+          PILOT_TO_ADDRESS: ${{ secrets.PILOT_TO_ADDRESS }}

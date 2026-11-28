@@ -1219,3 +1219,15 @@ main:focus {
     font-size: 15px;
   }
 }
+
+/* Hosted pilot application form (/pilot/). */
+.pilot-form { display: grid; gap: 14px; max-width: 640px; margin: 16px 0 24px; }
+.pilot-form label { display: grid; gap: 6px; font-weight: 500; }
+.pilot-form input:not([type='checkbox']), .pilot-form select, .pilot-form textarea {
+  font: inherit; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--ink);
+}
+.pilot-form fieldset { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: grid; gap: 6px; }
+.pilot-form legend { font-weight: 500; padding: 0 4px; }
+.pilot-form .check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+.pilot-form .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+#pilot-status { min-height: 1.5em; color: var(--accent-hover); font-weight: 500; }
