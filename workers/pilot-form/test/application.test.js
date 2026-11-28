@@ -6,7 +6,7 @@ import { buildRawEmail, validateApplication } from '../src/application.js';
 const good = {
   organization: 'Randolph County Planning',
   orgType: 'Agency',
-  users: '8',
+  users: '6 to 15',
   today: ['ArcGIS Online', 'Paper or spreadsheets'],
   workflows: 'Culvert inspections with photos.',
   contactName: 'Jo Smith, GIS lead',
@@ -21,9 +21,9 @@ test('a complete application passes and joins checkbox groups', () => {
 });
 
 test('missing, oversized and off-list values are refused by field', () => {
-  const r = validateApplication({ ...good, organization: '  ', orgType: 'Cult', email: 'nope', workflows: 'x'.repeat(5000) });
+  const r = validateApplication({ ...good, organization: '  ', orgType: 'Cult', users: 'Meow', email: 'nope', workflows: 'x'.repeat(5000) });
   assert.equal(r.ok, false);
-  assert.deepEqual(Object.keys(r.errors).sort(), ['email', 'orgType', 'organization', 'workflows']);
+  assert.deepEqual(Object.keys(r.errors).sort(), ['email', 'orgType', 'organization', 'users', 'workflows']);
 });
 
 test('the email cannot gain headers from a submission', () => {

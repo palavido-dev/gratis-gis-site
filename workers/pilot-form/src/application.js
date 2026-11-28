@@ -18,6 +18,7 @@ export const FIELDS = [
 
 export const ORG_TYPES = ['Agency', 'School', 'Nonprofit', 'Company', 'Other'];
 export const CASE_STUDY = ['Yes', 'Maybe', 'No'];
+export const USER_RANGES = ['1 to 5', '6 to 15', '16 to 50', '51 to 200', 'More than 200'];
 
 // Deliberately loose: one @, something on each side, a dot in the
 // domain, no spaces or line breaks. The reply is what proves it.
@@ -45,6 +46,7 @@ export function validateApplication(input) {
   }
   if (values.orgType && !ORG_TYPES.includes(values.orgType)) errors.orgType = 'Pick one.';
   if (values.caseStudy && !CASE_STUDY.includes(values.caseStudy)) errors.caseStudy = 'Pick one.';
+  if (values.users && !USER_RANGES.includes(values.users)) errors.users = 'Pick one.';
   if (values.email && !EMAIL_RE.test(values.email)) errors.email = 'That does not look like an email address.';
   return Object.keys(errors).length > 0 ? { ok: false, errors } : { ok: true, values };
 }

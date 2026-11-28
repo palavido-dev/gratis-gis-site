@@ -15,6 +15,8 @@ const FORM_URL = 'https://forms.gratisgis.org/';
 // fall back to email and GitHub only.
 const SITE_KEY = '0x4AAAAAAGWjLxlSRhZxp3xh';
 const ORG_TYPES = ['Agency', 'School', 'Nonprofit', 'Company', 'Other'];
+// Keep in step with USER_RANGES in workers/pilot-form/src/application.js.
+const USER_RANGES = ['1 to 5', '6 to 15', '16 to 50', '51 to 200', 'More than 200'];
 const TODAY = ['ArcGIS Online', 'ArcGIS Enterprise', 'QGIS only', 'Paper or spreadsheets', 'Something else'];
 const DEADLINE = 'January 31, 2027';
 const PUBLIC_URL = `${REPO_URL}/discussions/new?category=hosted-pilot`;
@@ -88,7 +90,12 @@ const mailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent('GratisGIS ho
               {ORG_TYPES.map((t) => <option>{t}</option>)}
             </select>
           </label>
-          <label>How many people would use it<input name="users" required maxlength="100" /></label>
+          <label>How many people would use it
+            <select name="users" required>
+              <option value="">Pick one</option>
+              {USER_RANGES.map((r) => <option>{r}</option>)}
+            </select>
+          </label>
           <fieldset>
             <legend>What you use today</legend>
             {TODAY.map((t) => <label class="check"><input type="checkbox" name="today" value={t} /> {t}</label>)}
